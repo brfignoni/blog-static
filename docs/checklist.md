@@ -2,35 +2,47 @@
 
 ## Phase 1: Google Cloud Setup
 
-- [ ] Create a Google Cloud project (or use existing one)
-- [ ] Enable the Google Drive API
-- [ ] Enable the Google Docs API
-- [ ] Create a Service Account and download the JSON key
-- [ ] Create a dedicated Drive folder for blog posts
-- [ ] Share the Drive folder with the service account email
-- [ ] Define a metadata convention for docs (e.g., a YAML block or table at the top: `Title`, `Slug`, `Author`, `Date`, `Tags`, `Status`)
-- [ ] Write a sample Google Doc following the metadata convention
+- [x] Create a Google Cloud project (or use existing one)
+- [x] Enable the Google Drive API
+- [x] Enable the Google Docs API
+- [x] Create a Service Account and download the JSON key
+  > A service account is a non-human Google identity that your sync script uses to authenticate against the Drive and Docs APIs. Instead of logging in as a user, the script uses the JSON key file to prove its identity — no browser or interactive login needed. You share the Drive folder with the service account email just like you would with a colleague.
+  1. Go to **Google Cloud Console → IAM & Admin → Service Accounts**
+  2. Click **"Create Service Account"**
+  3. Name: `blog-drive-sync` — Description: "Syncs blog posts from Google Drive to the blog-static GitHub repo."
+  4. Skip "Grant this service account access to project" (no roles needed)
+  5. Skip "Grant users access to this service account" — leave blank, click **Done**
+  6. Click into the new account → **Keys** tab → **Add Key → Create new key → JSON**
+  7. Save the downloaded `.json` file (you'll store it as a GitHub Secret later)
+- [x] Create a dedicated Drive folder for blog posts
+- [x] Share the Drive folder with the service account email
+  > Go to the Drive folder, click **Share**, and add the service account email (e.g., `blog-drive-sync@blog-static-2025.iam.gserviceaccount.com`) as a **Viewer**. This is what gives the sync script permission to read the docs — no project-level IAM needed.
+- [ ] Define a metadata convention for docs
+  <!-- Auto-extracted from Drive/Docs API: Title (doc title), Slug (folder + doc title), Author (file owner), Date (createdTime), Category (subfolder name) -->
+  - **Tags** — a line at the top of the doc, e.g., `tags: eleventy, static-site, google-docs`
+  - **Status** — prefix the doc title with `[DRAFT]` or `[ARCHIVED]` (no prefix = published)
+- [ ] Write a sample Google Doc following the convention
 
 ## Phase 2: Eleventy Site Scaffold
 
-- [ ] Initialize the repo (`npm init`)
-- [ ] Install Eleventy (`npm install @11ty/eleventy`)
-- [ ] Set up folder structure:
+- [x] Initialize the repo (`npm init`)
+- [x] Install Eleventy (`npm install @11ty/eleventy`)
+- [x] Set up folder structure:
   - `src/` — source files
   - `src/posts/` — Markdown blog posts
   - `src/_includes/` — layout templates
   - `src/_data/` — global data files
   - `_site/` — build output (add to `.gitignore`)
-- [ ] Create a base layout template (Nunjucks or Liquid)
-- [ ] Create a post layout template
-- [ ] Create a blog index page (list of posts)
-- [ ] Add a sample Markdown post manually and verify it builds
-- [ ] Configure `.eleventy.js` (input/output dirs, Markdown options, passthrough copy)
-- [ ] Add npm scripts: `"start": "eleventy --serve"`, `"build": "eleventy"`
-- [ ] Install and configure essential plugins:
-  - [ ] `@11ty/eleventy-plugin-syntaxhighlight`
-  - [ ] `@11ty/eleventy-plugin-rss`
-- [ ] Verify local dev server works (`npm start`)
+- [x] Create a base layout template (Nunjucks or Liquid)
+- [x] Create a post layout template
+- [x] Create a blog index page (list of posts)
+- [x] Add a sample Markdown post manually and verify it builds
+- [x] Configure `eleventy.config.js` (input/output dirs, Markdown options, passthrough copy)
+- [x] Add npm scripts: `"start": "eleventy --serve"`, `"build": "eleventy"`
+- [x] Install and configure essential plugins:
+  - [x] `@11ty/eleventy-plugin-syntaxhighlight`
+  - [x] `@11ty/eleventy-plugin-rss`
+- [x] Verify local dev server works (`npm start`)
 
 ## Phase 3: Google Docs → Markdown Parser
 
