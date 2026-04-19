@@ -1,0 +1,17 @@
+---
+layout: base.njk
+---
+<article>
+  <h1>{{ title }}</h1>
+  <p class="post-meta">
+    <time datetime="{{ page.date | dateToRfc3339 }}">{{ page.date | readableDate }}</time>
+    {% if author %} · {{ author }}{% endif %}
+    {% if category %} · <span class="category">{{ category }}</span>{% endif %}
+  </p>
+  {% if tags %}
+  <ul class="tags">
+    {% for tag in tags %}{% if tag != "posts" %}<li>{{ tag }}</li>{% endif %}{% endfor %}
+  </ul>
+  {% endif %}
+  {{ content | safe }}
+</article>
