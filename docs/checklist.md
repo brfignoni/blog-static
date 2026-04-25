@@ -15,6 +15,7 @@
   6. Click into the new account → **Keys** tab → **Add Key → Create new key → JSON**
   7. Save the downloaded `.json` file (you'll store it as a GitHub Secret later)
 - [x] Create a dedicated Drive folder for blog posts
+  > To find the folder ID: open the folder in Google Drive and look at the URL — `https://drive.google.com/drive/folders/ABC123` → the ID is `ABC123`. You'll need this ID for the sync script config.
 - [x] Share the Drive folder with the service account email
   > Go to the Drive folder, click **Share**, and add the service account email (e.g., `blog-drive-sync@blog-static-2025.iam.gserviceaccount.com`) as a **Viewer**. This is what gives the sync script permission to read the docs — no project-level IAM needed.
 - [ ] Define a metadata convention for docs
@@ -46,21 +47,21 @@
 
 ## Phase 3: Google Docs → Markdown Parser
 
-- [ ] Install Google API client (`npm install googleapis` or `@googleapis/docs @googleapis/drive`)
-- [ ] Write a script to authenticate with the service account
-- [ ] Write a script to list docs in the designated Drive folder
-- [ ] Write a script to fetch a doc's structured content via the Docs API (`documents.get`)
-- [ ] Build the Docs-to-Markdown walker (~200-400 lines of TypeScript):
-  - [ ] Handle headings (H1, H2, H3)
-  - [ ] Handle paragraphs and inline formatting (bold, italic, code)
-  - [ ] Handle ordered and unordered lists
-  - [ ] Handle links
-  - [ ] Handle code blocks
-  - [ ] Handle tables
-  - [ ] Extract the metadata block and convert to YAML frontmatter
-- [ ] **Iteration 1 shortcut for images:** skip image extraction — either ignore or link to Drive URLs temporarily
-- [ ] Write output as `.md` files to `src/posts/<slug>.md`
-- [ ] Test the parser end-to-end with the sample doc
+- [x] Install Google API client (`npm install googleapis`)
+- [x] Write a script to authenticate with the service account
+- [x] Write a script to list docs in the designated Drive folder
+- [x] Write a script to fetch a doc's structured content via the Docs API (`documents.get`)
+- [x] Build the Docs-to-Markdown walker:
+  - [x] Handle headings (H1, H2, H3)
+  - [x] Handle paragraphs and inline formatting (bold, italic, code)
+  - [x] Handle ordered and unordered lists
+  - [x] Handle links
+  - [x] Handle code blocks
+  - [x] Handle tables
+  - [x] Extract the metadata block and convert to YAML frontmatter
+- [x] **Iteration 1 shortcut for images:** skip image extraction — either ignore or link to Drive URLs temporarily
+- [x] Write output as `.md` files to `src/posts/<slug>.md`
+- [x] Test the parser end-to-end with the sample doc
 
 ## Phase 4: Sync Logic
 
