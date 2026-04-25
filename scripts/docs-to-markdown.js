@@ -9,13 +9,15 @@ export async function docToMarkdown(docId) {
   const res = await docs.documents.get({ documentId: docId });
   const doc = res.data;
   const body = doc.body.content || [];
+  const lists = doc.lists || {};
 
   let markdown = "";
   let tags = [];
+  const listCounters = {};
 
   for (const element of body) {
     if (element.paragraph) {
-      const result = convertParagraph(element.paragraph);
+      const result = convertParagraph(element.paragraph, lists, listCounters);
 
       // Check for tags line (e.g., "tags: foo, bar, baz")
       const tagsMatch = result.match(/^tags:\s*(.+)$/i);
@@ -33,7 +35,7 @@ export async function docToMarkdown(docId) {
   return { markdown: markdown.trim() + "\n", tags };
 }
 
-function convertParagraph(paragraph) {
+function convertParagraph(paragraph, lists, listCounters) {
   const style = paragraph.paragraphStyle?.namedStyleType || "NORMAL_TEXT";
   const elements = paragraph.elements || [];
   let text = "";
@@ -66,13 +68,37 @@ function convertParagraph(paragraph) {
     const level = bullet.nestingLevel || 0;
     const indent = "  ".repeat(level);
     const listId = bullet.listId;
-    // We can't easily distinguish ordered vs unordered from the API without
-    // checking the list properties, so we use "-" for all lists in iteration 1.
-    // TODO: check doc.lists[listId].listProperties for ordered lists
+    const isOrdered = isOrderedList(lists, listId, level);
+
+    if (isOrdered) {
+      const key = `${listId}-${level}`;
+      listCounters[key] = (listCounters[key] || 0) + 1;
+      return `${indent}${listCounters[key]}. ${text}\n`;
+    }
+
     return `${indent}- ${text}\n`;
   }
 
+  // Reset list counters when we hit a non-list paragraph
+  for (const key of Object.keys(listCounters)) {
+    delete listCounters[key];
+  }
+
   return `${text}\n\n`;
+}
+
+function isOrderedList(lists, listId, nestingLevel) {
+  const list = lists[listId];
+  if (!list) return false;
+  const props = list.listProperties?.nestingLevels?.[nestingLevel];
+  if (!props) return false;
+  // If glyphType is set and not GLYPH_TYPE_UNSPECIFIED, it's ordered
+  // Common ordered types: DECIMAL, UPPER_ALPHA, LOWER_ALPHA, UPPER_ROMAN, LOWER_ROMAN
+  const glyphType = props.glyphType;
+  if (glyphType && glyphType !== "GLYPH_TYPE_UNSPECIFIED") return true;
+  // If glyphSymbol is set (e.g., bullet characters), it's unordered
+  if (props.glyphSymbol) return false;
+  return false;
 }
 
 function convertTextRun(textRun) {
