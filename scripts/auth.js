@@ -1,5 +1,5 @@
 import { google } from "googleapis";
-import { readFileSync, readdirSync } from "fs";
+import { readFileSync, readdirSync, existsSync } from "fs";
 import { resolve } from "path";
 
 function findKeyFile() {
@@ -8,20 +8,15 @@ function findKeyFile() {
     return JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
   }
 
-  // Locally, find the first .json file that looks like a service account key
-  const root = resolve(process.cwd());
-  const files = readdirSync(root).filter(
-    (f) =>
-      f.endsWith(".json") &&
-      f !== "package.json" &&
-      f !== "package-lock.json" &&
-      f !== "sync-state.json"
-  );
-
-  for (const file of files) {
-    const content = JSON.parse(readFileSync(resolve(root, file), "utf-8"));
-    if (content.type === "service_account") {
-      return content;
+  // Locally, look for a service account key in .secrets/
+  const secretsDir = resolve(process.cwd(), ".secrets");
+  if (existsSync(secretsDir)) {
+    const files = readdirSync(secretsDir).filter((f) => f.endsWith(".json"));
+    for (const file of files) {
+      const content = JSON.parse(readFileSync(resolve(secretsDir, file), "utf-8"));
+      if (content.type === "service_account") {
+        return content;
+      }
     }
   }
 
