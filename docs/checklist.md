@@ -112,6 +112,9 @@
 
 ## Future iterations (not for now)
 
+- [ ] Add block quote support to `docs-to-markdown.js`
+- [ ] Add horizontal rule support to `docs-to-markdown.js`
+
 - [ ] **Iteration 2:** Image extraction + re-hosting, draft/published states, deploy previews per PR
 - [ ] **Iteration 3:** "Publish" button via Google Apps Script, Slack notifications
 - [ ] **Iteration 4:** MDX/shortcodes, Pagefind search, RSS, related posts
