@@ -3,3 +3,4 @@ _site/
 *.json
 !package.json
 !package-lock.json
+sync-state.json
