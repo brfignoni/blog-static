@@ -17,6 +17,18 @@ Google doesn't officially document this behavior, but it's a known eventual cons
 
 Delays typically vary based on file size and server load — sometimes instant, other times several seconds or more.
 
+### Why This Breaks `sync.js`
+
+`sync.js` runs on a cron schedule and must decide — cheaply and correctly — whether a doc has new content worth fetching. If it used `modifiedTime` as the change signal, it would hit this race:
+
+1. The cron fires and calls `drive.files.list` — `modifiedTime` is fresh, so the doc looks changed.
+2. `sync.js` calls `docs.documents.get` to fetch the content.
+3. The Docs content store hasn't caught up yet — it returns the **previous version** of the document.
+4. `sync.js` writes that stale content to `src/posts/` and commits it to the repo.
+5. On the next cron run, `modifiedTime` is still the same — so `sync.js` sees "no change" and never re-fetches the now-committed content.
+
+The result is a silently wrong post in the repo that never self-corrects, because `modifiedTime` won't change again until the author edits the doc a second time.
+
 ### Solution Adopted
 
 `sync.js` avoids `modifiedTime` entirely. Instead, it uses `drive.revisions.list` as the change signal and persists the last seen revision ID **per Google Doc** in a local `sync-state.json` file.
