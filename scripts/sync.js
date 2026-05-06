@@ -2,6 +2,7 @@ import { writeFileSync, mkdirSync, readFileSync, existsSync } from "fs";
 import { resolve, join } from "path";
 import { listDocs } from "./list-docs.js";
 import { docToMarkdown } from "./docs-to-markdown.js";
+import { getDrive } from "./auth.js";
 import { POSTS_DIR } from "./config.js";
 
 const STATE_FILE = resolve(process.cwd(), "sync-state.json");
@@ -53,8 +54,12 @@ async function sync() {
       continue;
     }
 
-    // Skip if not modified since last sync
-    if (state[doc.id] && state[doc.id] === doc.modifiedTime) {
+    // Check latest revision (lightweight call) to detect content changes
+    const drive = getDrive();
+    const revisions = await drive.revisions.list({ fileId: doc.id, fields: "revisions(id)" });
+    const latestRevisionId = revisions.data.revisions?.at(-1)?.id;
+
+    if (state[doc.id] && state[doc.id] === latestRevisionId) {
       console.log(`  No changes: ${doc.name}`);
       continue;
     }
@@ -67,7 +72,7 @@ async function sync() {
     const author = doc.owners?.[0]?.displayName || "Unknown";
     const date = doc.createdTime.split("T")[0];
 
-    // Convert doc to Markdown
+    // Only fetch full content when revision changed
     const { markdown, tags } = await docToMarkdown(doc.id);
 
     // Build frontmatter
@@ -96,8 +101,8 @@ async function sync() {
     writeFileSync(filePath, frontmatter + markdown);
     console.log(`  Wrote: ${filePath}`);
 
-    // Update state
-    state[doc.id] = doc.modifiedTime;
+    // Save the revision ID from drive.revisions.list
+    state[doc.id] = latestRevisionId;
     synced++;
   }
 

@@ -32,7 +32,7 @@ export async function docToMarkdown(docId) {
     }
   }
 
-  return { markdown: markdown.trim() + "\n", tags };
+  return { markdown: markdown.trim() + "\n", tags, revisionId: doc.revisionId };
 }
 
 function convertParagraph(paragraph, lists, listCounters) {

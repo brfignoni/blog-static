@@ -67,7 +67,7 @@
 
 - [ ] Write a sync script that:
   - [ ] Lists all docs in the Drive folder
-  - [ ] Compares `modifiedTime` against a stored state file (e.g., `sync-state.json`) or git log
+  - [ ] Compares the latest revision ID (via `drive.revisions.list`) against a stored state file (`sync-state.json`) per doc
   - [ ] Identifies new or changed docs
   - [ ] Runs the parser only on changed docs
   - [ ] Commits the resulting `.md` files to the repo

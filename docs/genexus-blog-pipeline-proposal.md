@@ -53,7 +53,7 @@ Docs is great for collaborative writing but it's not a CMS — it has no concept
 
 Three viable options, in order of simplicity:
 
-1. **GitHub Actions scheduled workflow** — a cron job (e.g. hourly) runs a Node script that uses the Google Drive API to list docs in the folder, compares `modifiedTime` to a stored state file (or git log), and processes what's new or changed. Dead simple, no servers, free. **This is what I'd ship in iteration 1.**
+1. **GitHub Actions scheduled workflow** — a cron job (e.g. hourly) runs a Node script that uses the Google Drive API to list docs in the folder, compares the latest revision ID (via `drive.revisions.list`) against a stored state file (`sync-state.json`), and processes what's new or changed. Dead simple, no servers, free. **This is what I'd ship in iteration 1.**
 2. **Google Apps Script** attached to the Drive folder — triggers on edit, calls a webhook on your repo. Lower latency but more moving parts.
 3. **Google Drive Push Notifications** (webhooks) hitting a Cloudflare Worker or Vercel Function — proper event-driven, but overkill for v1.
 
