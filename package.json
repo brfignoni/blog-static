@@ -5,7 +5,10 @@
   "scripts": {
     "start": "eleventy --serve",
     "build": "eleventy",
-    "sync": "node scripts/sync.js"
+    "sync": "node scripts/sync.js",
+    "clear:posts": "node scripts/clear-posts.js",
+    "clear:state": "node scripts/clear-state.js",
+    "clear": "npm run clear:posts && npm run clear:state"
   },
   "keywords": [],
   "author": "",
