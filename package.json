@@ -8,7 +8,8 @@
     "sync": "node scripts/sync.js",
     "clear:posts": "node scripts/clear-posts.js",
     "clear:state": "node scripts/clear-state.js",
-    "clear": "npm run clear:posts && npm run clear:state"
+    "clear:site": "node scripts/clear-site.js",
+    "clear": "npm run clear:posts && npm run clear:state && npm run clear:site"
   },
   "keywords": [],
   "author": "",
