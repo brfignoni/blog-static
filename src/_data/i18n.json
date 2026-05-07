@@ -1,0 +1,34 @@
+{
+  "languages": {
+    "es": { "label": "Español" },
+    "en": { "label": "English" },
+    "pt": { "label": "Português" }
+  },
+  "categories": {
+    "diseño": {
+      "es": { "label": "Diseño",                    "slug": "diseño" },
+      "en": { "label": "Design",                    "slug": "design" },
+      "pt": { "label": "Desenho",                   "slug": "desenho" }
+    },
+    "interes-general": {
+      "es": { "label": "Interés General",           "slug": "interes-general" },
+      "en": { "label": "General Interest",          "slug": "general-interest" },
+      "pt": { "label": "Interesse Geral",           "slug": "interesse-geral" }
+    },
+    "plataforma-genexus": {
+      "es": { "label": "Plataforma GeneXus",        "slug": "plataforma-genexus" },
+      "en": { "label": "GeneXus Platform",          "slug": "genexus-platform" },
+      "pt": { "label": "Plataforma GeneXus",        "slug": "plataforma-genexus" }
+    },
+    "desarrollo-de-software": {
+      "es": { "label": "Desarrollo de Software",    "slug": "desarrollo-de-software" },
+      "en": { "label": "Software Development",      "slug": "software-development" },
+      "pt": { "label": "Desenvolvimento de Software", "slug": "desenvolvimiento-de-software" }
+    },
+    "eventos": {
+      "es": { "label": "Eventos",                   "slug": "eventos" },
+      "en": { "label": "Events",                    "slug": "events" },
+      "pt": { "label": "Eventos",                   "slug": "eventos" }
+    }
+  }
+}
