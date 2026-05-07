@@ -1,5 +1,6 @@
 ---
 layout: post.njk
+translationKey: "17sYAPOr5IRlSLInwoONHpBBcyexokPVPU-wivz0rL10"
 title: "A importância de se desconectar das telas"
 author: brfignoni
 date: 2026-05-07

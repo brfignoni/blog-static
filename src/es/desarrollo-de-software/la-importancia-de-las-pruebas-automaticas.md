@@ -1,5 +1,6 @@
 ---
 layout: post.njk
+translationKey: "1MvI8TVN7PClp0ZpNn5OfMGkyFeglb17XKX9nONtNhms"
 title: "La importancia de las pruebas automáticas"
 author: brfignoni
 date: 2026-05-07

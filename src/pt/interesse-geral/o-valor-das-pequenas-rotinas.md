@@ -1,5 +1,6 @@
 ---
 layout: post.njk
+translationKey: "1O5HR6ZSl3LTnBRpdIstC_6kjAximQQAW_Ik2Ug5MPes"
 title: "O valor das pequenas rotinas"
 author: brfignoni
 date: 2026-04-18

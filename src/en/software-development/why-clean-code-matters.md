@@ -1,5 +1,6 @@
 ---
 layout: post.njk
+translationKey: "1PUqIk6KAMAutRHH8o5mjBOvbX98acGiqiFeHcEr-jTM"
 title: "Why Clean Code Matters"
 author: brfignoni
 date: 2026-05-07
