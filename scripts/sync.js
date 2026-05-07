@@ -1,9 +1,13 @@
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from "fs";
 import { resolve, join } from "path";
+import { createRequire } from "module";
 import { listDocs } from "./list-docs.js";
 import { docToMarkdown } from "./docs-to-markdown.js";
 import { getDrive } from "./auth.js";
 import { POSTS_DIR } from "./config.js";
+
+const require = createRequire(import.meta.url);
+const I18N = require("../src/_data/i18n.json");
 
 const STATE_FILE = resolve(process.cwd(), "sync-state.json");
 
@@ -66,40 +70,50 @@ async function sync() {
 
     console.log(`  Syncing: ${doc.name}...`);
 
-    const title = cleanTitle(doc.name);
-    const slug = slugify(title);
-    const category = doc.category ? slugify(doc.category) : null;
+    const docTitle = cleanTitle(doc.name);
+    const docCategory = doc.category || null;
     const author = doc.owners?.[0]?.displayName || "Unknown";
     const date = doc.createdTime.split("T")[0];
 
     // Only fetch full content when revision changed
-    const { markdown, tags } = await docToMarkdown(doc.id);
+    const { tabs } = await docToMarkdown(doc.id);
 
-    // Build frontmatter
-    let frontmatter = `---\n`;
-    frontmatter += `title: "${title}"\n`;
-    frontmatter += `author: ${author}\n`;
-    frontmatter += `date: ${date}\n`;
-    if (category) frontmatter += `category: ${category}\n`;
-    if (tags.length > 0) {
+    if (Object.keys(tabs).length === 0) {
+      console.log(`  Warning: no valid language tabs (en/es/pt) found in "${doc.name}" — skipping`);
+      continue;
+    }
+
+    for (const [lang, { markdown, tags, title: tabTitle, category: tabCategory }] of Object.entries(tabs)) {
+      const title = tabTitle || docTitle;
+      const docCategorySlug = docCategory ? slugify(docCategory) : null;
+      const categorySlug = docCategorySlug
+        ? I18N.categories[docCategorySlug]?.[lang]?.slug ?? docCategorySlug
+        : null;
+      const titleSlug = slugify(title);
+
+      // Build frontmatter
+      let frontmatter = `---\n`;
+      frontmatter += `title: "${title}"\n`;
+      frontmatter += `author: ${author}\n`;
+      frontmatter += `date: ${date}\n`;
+      frontmatter += `lang: ${lang}\n`;
+      if (categorySlug) frontmatter += `category: ${categorySlug}\n`;
       frontmatter += `tags:\n  - posts\n`;
       for (const tag of tags) {
         frontmatter += `  - ${tag}\n`;
       }
-    } else {
-      frontmatter += `tags:\n  - posts\n`;
+      frontmatter += `---\n\n`;
+
+      // Write to src/<lang>/posts/<category>/<title-slug>.md
+      const outputDir = categorySlug
+        ? resolve(process.cwd(), "src", lang, "posts", categorySlug)
+        : resolve(process.cwd(), "src", lang, "posts");
+      mkdirSync(outputDir, { recursive: true });
+
+      const filePath = join(outputDir, `${titleSlug}.md`);
+      writeFileSync(filePath, frontmatter + markdown);
+      console.log(`  Wrote [${lang}]: ${filePath}`);
     }
-    frontmatter += `---\n\n`;
-
-    // Write the file
-    const outputDir = category
-      ? resolve(process.cwd(), POSTS_DIR, category)
-      : resolve(process.cwd(), POSTS_DIR);
-    mkdirSync(outputDir, { recursive: true });
-
-    const filePath = join(outputDir, `${slug}.md`);
-    writeFileSync(filePath, frontmatter + markdown);
-    console.log(`  Wrote: ${filePath}`);
 
     // Save the revision ID from drive.revisions.list
     state[doc.id] = latestRevisionId;
