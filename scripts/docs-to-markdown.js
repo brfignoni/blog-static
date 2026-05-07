@@ -1,28 +1,70 @@
 import { getDocs } from "./auth.js";
 
+const VALID_LANGS = ["es", "en", "pt"];
+
+function normalizeLang(tabTitle) {
+  const lower = (tabTitle || "").trim().toLowerCase();
+  return VALID_LANGS.includes(lower) ? lower : null;
+}
+
 /**
- * Fetches a Google Doc and converts its structured content to Markdown.
- * Returns { markdown, tags } where tags are extracted from a "tags:" line.
+ * Fetches a Google Doc and converts each language tab to Markdown.
+ * Looks for tabs named es/en/pt (case-insensitive); ignores all others.
+ * Returns { tabs: { es: TabResult, en?: TabResult, pt?: TabResult } }
+ * where TabResult = { markdown, tags, title, category }
  */
 export async function docToMarkdown(docId) {
   const docs = getDocs();
-  const res = await docs.documents.get({ documentId: docId });
-  const doc = res.data;
-  const body = doc.body.content || [];
-  const lists = doc.lists || {};
+  const res = await docs.documents.get({ documentId: docId, includeTabsContent: true });
 
+  const tabs = {};
+
+  for (const tab of res.data.tabs || []) {
+    const lang = normalizeLang(tab.tabProperties?.title);
+    if (!lang) continue;
+    const body = tab.documentTab?.body?.content || [];
+    const lists = tab.documentTab?.lists || {};
+    tabs[lang] = parseTabContent(body, lists);
+  }
+
+  return { tabs };
+}
+
+function parseTabContent(body, lists) {
   let markdown = "";
   let tags = [];
+  let title = null;
+  let category = null;
   const listCounters = {};
 
   for (const element of body) {
     if (element.paragraph) {
+      const style = element.paragraph.paragraphStyle?.namedStyleType;
+
+      // Extract title from the first Title or Heading 1 paragraph
+      if (!title && (style === "TITLE" || style === "HEADING_1")) {
+        const text = (element.paragraph.elements || [])
+          .map((el) => el.textRun?.content || "")
+          .join("")
+          .replace(/\n$/, "")
+          .trim();
+        if (text) {
+          title = text;
+          continue;
+        }
+      }
+
       const result = convertParagraph(element.paragraph, lists, listCounters);
 
-      // Check for tags line (e.g., "tags: foo, bar, baz")
       const tagsMatch = result.match(/^tags:\s*(.+)$/i);
       if (tagsMatch) {
         tags = tagsMatch[1].split(",").map((t) => t.trim());
+        continue;
+      }
+
+      const categoryMatch = result.match(/^category:\s*(.+)$/i);
+      if (categoryMatch) {
+        category = categoryMatch[1].trim();
         continue;
       }
 
@@ -32,7 +74,7 @@ export async function docToMarkdown(docId) {
     }
   }
 
-  return { markdown: markdown.trim() + "\n", tags, revisionId: doc.revisionId };
+  return { markdown: markdown.trim() + "\n", tags, title, category };
 }
 
 function convertParagraph(paragraph, lists, listCounters) {
