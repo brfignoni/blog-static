@@ -96,6 +96,7 @@ async function sync() {
       // Build frontmatter
       let frontmatter = `---\n`;
       frontmatter += `layout: post.njk\n`;
+      frontmatter += `translationKey: "${doc.id}"\n`;
       frontmatter += `title: "${title}"\n`;
       frontmatter += `author: ${author}\n`;
       frontmatter += `date: ${date}\n`;
