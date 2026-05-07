@@ -1,13 +1,13 @@
 ---
 layout: base.njk
 title: GeneXus Blog
-lang: es
+lang: en
 translationKey: home
-feed: true
+permalink: /en/
 ---
 <h1>GeneXus Blog</h1>
 <ul class="post-list">
-  {%- for post in collections.posts | postsByLang("es") | reverse -%}
+  {%- for post in collections.posts | postsByLang("en") | reverse -%}
   <li>
     <a href="{{ post.url }}">{{ post.data.title }}</a>
     <time datetime="{{ post.date | dateToRfc3339 }}">{{ post.date | readableDate }}</time>
