@@ -12,6 +12,14 @@
     <nav>
       <a href="/">GeneXus Blog</a>
     </nav>
+    {% set translations = collections.all | getTranslations(translationKey, lang) %}
+    {% if translations.length %}
+    <ul class="language-switcher">
+      {% for post in translations %}
+      <li><a href="{{ post.url }}" lang="{{ post.data.lang }}" hreflang="{{ post.data.lang }}">{{ i18n.languages[post.data.lang].label }}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
   </header>
   <main>
     {{ content | safe }}
