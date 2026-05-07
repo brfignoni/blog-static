@@ -14,6 +14,8 @@ const STATE_FILE = resolve(process.cwd(), "sync-state.json");
 function slugify(text) {
   return text
     .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/\[draft\]\s*/i, "")
     .replace(/\[archived\]\s*/i, "")
     .replace(/[^a-z0-9]+/g, "-")
@@ -93,6 +95,7 @@ async function sync() {
 
       // Build frontmatter
       let frontmatter = `---\n`;
+      frontmatter += `layout: post.njk\n`;
       frontmatter += `title: "${title}"\n`;
       frontmatter += `author: ${author}\n`;
       frontmatter += `date: ${date}\n`;
@@ -106,8 +109,8 @@ async function sync() {
 
       // Write to src/<lang>/posts/<category>/<title-slug>.md
       const outputDir = categorySlug
-        ? resolve(process.cwd(), "src", lang, "posts", categorySlug)
-        : resolve(process.cwd(), "src", lang, "posts");
+        ? resolve(process.cwd(), "src", lang, categorySlug)
+        : resolve(process.cwd(), "src", lang);
       mkdirSync(outputDir, { recursive: true });
 
       const filePath = join(outputDir, `${titleSlug}.md`);
